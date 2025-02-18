@@ -1,18 +1,18 @@
-# 📌 Predictive Audit Risk Scoring
+#  Predictive Audit Risk Scoring
 
-## 🚀 Project Overview
+##  Project Overview
 Predictive Audit Risk Scoring is a **machine learning-powered** system that assesses financial and audit risk based on historical data. Using **XGBoost & Flask**, it predicts risk scores and provides insights into financial anomalies, helping auditors and financial institutions prevent fraud.
 
-## 🎯 Purpose of This Repository
+##  Purpose of This Repository
 This repository is dedicated to developing a **predictive audit risk scoring system**, making it:
-- **Accurate** ✅ - Uses ML models for risk prediction.
-- **Explainable** 📊 - Includes SHAP visualizations.
-- **Scalable** ☁️ - Deployable on AWS, Azure, or local servers.
-- **Interactive** 🖥️ - Frontend UI with Streamlit for user-friendly interactions.
+- **Accurate**  - Uses ML models for risk prediction.
+- **Explainable**  - Includes SHAP visualizations.
+- **Scalable**  - Deployable on AWS, Azure, or local servers.
+- **Interactive**  - Frontend UI with Streamlit for user-friendly interactions.
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 ```
 predictive-audit-risk-scoring/
 │── backend/                   # Backend API (Flask, ML model, Database)
@@ -32,22 +32,22 @@ predictive-audit-risk-scoring/
 
 ---
 
-## ✨ Key Features
-- ✅ **Flask API** - Backend for risk prediction.
-- ✅ **XGBoost Model** - Trained ML model for accuracy.
-- ✅ **SHAP Explainability** - Feature importance visualization.
-- ✅ **Streamlit UI** - Interactive user dashboard.
-- ✅ **Cloud Deployment Ready** - Scalable architecture.
+##  Key Features
+-  **Flask API** - Backend for risk prediction.
+-  **XGBoost Model** - Trained ML model for accuracy.
+-  **SHAP Explainability** - Feature importance visualization.
+-  **Streamlit UI** - Interactive user dashboard.
+-  **Cloud Deployment Ready** - Scalable architecture.
 
 ---
 
-## 🛠️ Installation Guide
-### 🔹 Prerequisites
+##  Installation Guide
+###  Prerequisites
 - Python 3.10+
 - Git
 - Virtual Environment (Recommended)
 
-### 🔹 Setup Instructions
+###  Setup Instructions
 ```bash
 # Clone the repository
 git clone https://github.com/YOUR-USERNAME/predictive-audit-risk-scoring.git
@@ -70,47 +70,47 @@ streamlit run frontend/app.py
 
 ---
 
-## 🤝 Contribution Guidelines
-### 🔹 How to Contribute
-1. **Fork the repository** 🍴
-2. **Clone your fork** 🔄
+##  Contribution Guidelines
+###  How to Contribute
+1. **Fork the repository** 
+2. **Clone your fork** 
    ```bash
    git clone https://github.com/YOUR-USERNAME/predictive-audit-risk-scoring.git
    cd predictive-audit-risk-scoring
    ```
-3. **Create a new branch** 🌿
+3. **Create a new branch** 
    ```bash
    git checkout -b feature-branch
    ```
-4. **Make changes & commit** ✏️
+4. **Make changes & commit** 
    ```bash
    git add .
    git commit -m "Added new feature"
    ```
-5. **Push changes** 🚀
+5. **Push changes** 
    ```bash
    git push origin feature-branch
    ```
-6. **Submit a Pull Request (PR)** ✅
+6. **Submit a Pull Request (PR)** 
 
-### 🔹 Code Formatting
+###  Code Formatting
 - Follow **PEP8** for Python.
 - Use meaningful commit messages.
 
 ---
 
-## 📜 License
+##  License
 This project is licensed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
 ---
 
-## 🌟 Code of Conduct
+##  Code of Conduct
 We follow a **friendly and inclusive** environment. Check out [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) for guidelines.
 
 ---
 
-## 📸 Demo & Usage
-### 🔹 API Demo
+##  Demo & Usage
+###  API Demo
 Test the API with `curl`:
 ```bash
 curl -X 'POST' 'http://127.0.0.1:8000/predict' -H 'Content-Type: application/json' -d '{
@@ -137,7 +137,7 @@ curl -X 'POST' 'http://127.0.0.1:8000/predict' -H 'Content-Type: application/jso
 }'
 ```
 
-### 🔹 UI Demo
+###  UI Demo
 1. **Start Streamlit App:**
    ```bash
    streamlit run frontend/app.py
@@ -146,11 +146,11 @@ curl -X 'POST' 'http://127.0.0.1:8000/predict' -H 'Content-Type: application/jso
 
 ---
 
-## 💡 Future Improvements
-- [ ] **Real-time Risk Monitoring** 📊
-- [ ] **Deploy to AWS/GCP** ☁️
-- [ ] **Enhance SHAP Explainability** 🔎
-- [ ] **Integrate Database Storage** 🗄️
+##  Future Improvements
+- [ ] **Real-time Risk Monitoring** 
+- [ ] **Deploy to AWS/GCP** 
+- [ ] **Enhance SHAP Explainability** 
+- [ ] **Integrate Database Storage** 
 
-💬 **Have suggestions? Feel free to open an issue!** 🚀
+ **Have suggestions? Feel free to open an issue!** 
 
