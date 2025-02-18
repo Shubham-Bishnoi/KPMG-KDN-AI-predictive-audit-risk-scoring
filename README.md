@@ -12,23 +12,21 @@ This repository is dedicated to developing a **predictive audit risk scoring sys
 
 ---
 
-##  Project Structure
-```
-predictive-audit-risk-scoring/
-│── backend/                   # Backend API (Flask, ML model, Database)
-│   │── api.py                 # Flask API for predictions
-│   │── model.py               # Model training script (XGBoost)
-│   │── xgb_model.pkl          # Trained ML model
-│── frontend/                  # UI with Streamlit
-│   │── app.py                 # Streamlit app for risk scoring
-│── database/                  # Database configuration
-│── deployment/                # Deployment scripts
-│── README.md                  # Documentation
-│── .gitignore                 # Ignore unnecessary files
-│── requirements.txt            # Dependencies
-│── LICENSE                    # Project License
-│── CODE_OF_CONDUCT.md          # Guidelines for contributions
-```
+##  **Project Structure**
+```bash
+task1/
+│── backend/                     # Backend logic & model training
+│   │── data/                     # Raw dataset files
+│   │── plots/                    # Stored visualization images
+│   │── api.py                     # FastAPI backend for predictions
+│   │── model.py                   # Model training & evaluation script
+│   │── xgb_model.pkl               # Trained machine learning model
+│── frontend/                     # Frontend UI (Streamlit)
+│   │── assets/                     # Static images/logos
+│   │── app.py                      # Streamlit frontend for risk prediction
+│── myenv/                         # Virtual environment (not committed)
+│── README.md                      # Project documentation
+│── requirements.txt                # Dependencies list
 
 ---
 
@@ -147,6 +145,54 @@ streamlit run frontend/app.py
 Open `http://localhost:8501/` in your browser.
 
 ---
+#  Risk Prediction Categories
+
+| **Risk Score** | **Category**    | **Description** |
+|---------------|----------------|----------------|
+| **0 - 100**   | 🔵 Low Risk     | Strong financial health |
+| **101 - 400** | 🟠 Moderate Risk | Some financial concerns but not critical |
+| **401 - 600** | 🔴 High Risk     | Severe financial instability or fraud risks |
+
+---
+
+#  Features Used in Model
+
+| **Feature**                 | **Description** |
+|-----------------------------|----------------|
+| **Sector Score**            | Risk level of the business sector |
+| **Financial Score**         | A score based on financial stability |
+| **Money Value**             | Total financial transactions in a company |
+| **Total Loss**              | Losses recorded in financial statements |
+| **Past Fraud History**      | Previous fraud reports in audits |
+| **Transaction Size**        | Large transactions are riskier |
+| **Operational Efficiency**  | Efficiency in handling funds |
+| **Loan Repayment Rate**     | Higher delays in payments → higher risk |
+| **Revenue Growth**          | Declining revenue may indicate financial instability |
+| **Tax Compliance Score**    | If a company evades taxes, risk is high |
+| **Business Age**            | New businesses are riskier than older, established ones |
+| **Financial Leverage**      | High debt levels increase financial risk |
+| **Cash Flow Stability**     | Inconsistent cash flows → higher risk |
+| **Audit Score**             | Past audit performance score |
+| **Company Size**            | Smaller businesses tend to have higher fraud risk |
+| **Regulatory Compliance**   | If regulations are frequently broken, risk is high |
+| **Board Independence**      | Independent boards reduce fraud risk |
+| **Profit Margin Stability** | Declining profits → financial distress |
+| **Supplier Risk Score**     | If suppliers are unreliable, risk is higher |
+| **Investment Risk**         | High-risk investments increase financial exposure |
+
+---
+
+ **Usage:**  
+- This file can be **linked in your main `README.md`** file.
+- Store this as **`risk_categories.md`** in your documentation folder.
+
+---
+
+ **Next Steps:**
+ **Create the file:**  
+```bash
+touch risk_categories.md
+
 
 ##  Future Improvements
 
@@ -176,6 +222,7 @@ The trained XGBoost model has been successfully saved at:
 Train Score: 0.9982882729944789
 Test Score: 0.9450530284419184
 ```
+
 
 ###  Generated Plots
 All plots generated during training and SHAP analysis are saved in the **plots/** directory:

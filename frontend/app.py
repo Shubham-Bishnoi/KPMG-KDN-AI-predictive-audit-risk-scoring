@@ -11,6 +11,35 @@ PLOT_DIR = "../backend/plots"  # Adjust the path based on your file structure
 st.title("🔍 Predictive Audit Risk Scoring")
 st.write("Enter the company's financial details to predict audit risk.")
 
+
+import base64
+
+# Define the correct logo path
+logo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "assets", "KPMG_logo.png"))
+
+# Function to convert image to base64
+def get_base64_of_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode()
+
+# Display the logo at the top-left if it exists
+if os.path.exists(logo_path):
+    logo_base64 = get_base64_of_image(logo_path)
+
+    st.markdown(
+        f"""
+        <div style="position: absolute; top: 2000px; left: 0px;">
+            <img src="data:image/png;base64,{logo_base64}" width="150">
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+else:
+    st.warning("⚠️ KPMG Logo not found! Ensure the correct PNG file is in 'frontend/assets/'.")
+
+
+
+
 # Creating input fields for all 20 features with descriptions
 feature_inputs = {
     "Sector Score": st.number_input("Risk level of the business sector", value=1.5),
