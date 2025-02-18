@@ -9,9 +9,18 @@ from sklearn.feature_selection import RFE
 from sklearn.feature_selection import RFECV
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
+import os
 
 import warnings
 warnings.filterwarnings("ignore")
+
+# Define the function to save plots
+def save_plot(fig, filename):
+    """Save a plot to the 'plots/' directory and close it."""
+    PLOT_DIR = "plots"
+    os.makedirs(PLOT_DIR, exist_ok=True)  # Ensure the directory exists
+    fig.savefig(os.path.join(PLOT_DIR, filename))
+    plt.close(fig)  # Prevent overlapping of multiple plots
 
 
 data_audit = pd.read_csv('data/audit_risk.csv')
@@ -65,8 +74,12 @@ dataset=pd.concat([data_audit,data_trial], axis=1)
 dataset.isnull().any()
 dataset.dropna(inplace=True)
 
-plt.figure(figsize=(35,25)) 
-sns.heatmap(dataset.corr(), annot=True) 
+# First Correlation Heatmap (Before Dropping Columns)
+fig = plt.figure(figsize=(35, 25)) 
+sns.heatmap(dataset.corr(), annot=True)
+plt.title("Feature Correlation Heatmap - Before Dropping Columns")
+save_plot(fig, "correlation_heatmap_before.png")
+
 
 dataset.drop(columns=['Detection_Risk','LOCATION_ID'],inplace=True,axis=1)
 
@@ -100,28 +113,46 @@ dataset.describe()
 
 dataset.shape
 
-plt.figure(figsize=(30,20)) 
-sns.heatmap(dataset.corr(), annot=True,  cmap="YlGnBu")
+# Correlation Heatmap
+# Second Correlation Heatmap (After Dropping Columns)
+fig = plt.figure(figsize=(30, 20))
+sns.heatmap(dataset.corr(), annot=True, cmap="YlGnBu")
+plt.title("Feature Correlation Heatmap - After Dropping Columns")
+save_plot(fig, "correlation_heatmap_after.png")
 
 dataset[dataset.dtypes[(dataset.dtypes=="float")].index.values].hist(figsize=[20,20])
 dataset[dataset.dtypes[(dataset.dtypes=="int64")].index.values].hist(figsize=[11,11])
+
+# Histograms for Float Features
+fig = dataset[dataset.dtypes[(dataset.dtypes == "float")].index.values].hist(figsize=[20, 20])
+plt.suptitle("Distribution of Float Features")
+save_plot(plt.gcf(), "float_features_histogram.png")
+
+# Histograms for Integer Features
+fig = dataset[dataset.dtypes[(dataset.dtypes == "int64")].index.values].hist(figsize=[11, 11])
+plt.suptitle("Distribution of Integer Features")
+save_plot(plt.gcf(), "integer_features_histogram.png")
 
 sns.pairplot(dataset, hue = 'Risk', vars = ['Sector_score','History','Score', 'TOTAL', 'Money_Value'])
 
 dataset['Risk'] = dataset['Risk'].astype(str) 
 
-custom_colors = {"0": "blue", "1": "orange"}
-
-sns.countplot(x='Risk', data=dataset, palette=custom_colors)
-
-plt.title("Count of Risk Levels")
-plt.xlabel("Risk")
-plt.ylabel("Count")
-
+# Count of Risk Levels
+fig = plt.figure(figsize=(10, 6))
+sns.countplot(x='Risk', data=dataset, palette={"0": "blue", "1": "orange"})
+plt.title("Distribution of Risk Levels")
+plt.xlabel("Risk Category")
+plt.ylabel("Number of Occurrences")
+save_plot(fig, "count_of_risk_levels.png")
 plt.show(block=False)
 
-plt.hist(dataset['Audit_Risk'],bins=100)
-plt.show(block=False)
+# Audit Risk Histogram
+fig = plt.figure(figsize=(10, 6))
+plt.hist(dataset['Audit_Risk'], bins=100, color='blue', alpha=0.7)
+plt.title("Audit Risk Score Distribution")
+plt.xlabel("Risk Score")
+plt.ylabel("Frequency")
+save_plot(fig, "audit_risk_distribution.png")
 
 
 dataset=dataset[dataset['Audit_Risk']<100]
@@ -156,10 +187,18 @@ standard_scaler=StandardScaler()
 X_train=standard_scaler.fit_transform(X_train_unscaled)
 X_test=standard_scaler.transform(X_test_unscaled)
 
-x2=pd.DataFrame(X_train)
-plt.figure(figsize=(15,10))
-sns.boxplot(data = x2)
-plt.ylim(-1,2.5)
+# Create DataFrame from X_train
+x2 = pd.DataFrame(X_train)
+
+# Create and save boxplot
+fig = plt.figure(figsize=(15, 10))
+sns.boxplot(data=x2)
+plt.ylim(-1, 2.5)
+plt.title("Boxplot of Scaled Features")
+
+# Save the plot
+save_plot(fig, "scaled_features_boxplot.png")
+
 
 
 from sklearn.ensemble import BaggingRegressor
@@ -209,13 +248,16 @@ results = gs.cv_results_
 scores = np.array(results["mean_test_score"]).reshape(len(param_dist['max_samples']), len(param_dist['n_estimators']))
 
 # Create a heatmap
-plt.figure(figsize=(10,10))
+fig = plt.figure(figsize=(10, 10))
 sns.heatmap(scores, annot=True, xticklabels=param_dist['n_estimators'], yticklabels=param_dist['max_samples'], cmap="YlGnBu")
 
 plt.xlabel('# of estimators')
 plt.ylabel('Max Samples')
 plt.title('Hyperparameter Tuning - Bagging : Validation Score across different parameters')
-plt.show(block=False)
+
+# Save the plot
+save_plot(fig, "bagging_hyperparameter_tuning_heatmap.png")
+
 
 
 print('Train score: {}'.format(gs.score(X_train,y_train)))
@@ -229,17 +271,21 @@ bag_reg = BaggingRegressor(DecisionTreeRegressor(random_state=0), n_estimators=3
                            random_state=0,oob_score=True)
 bag_reg.fit(X_b, y_b)
 
-X_new=np.linspace(X_b.min(), X_b.max(), 100).reshape(100, 1)
+# Generate new X values for prediction
+X_new = np.linspace(X_b.min(), X_b.max(), 100).reshape(100, 1)
 y_predict = bag_reg.predict(X_new)
 
-plt.figure(figsize=(10,6))
-plt.plot(X_new, y_predict, c = 'r',label='Prediction')
-plt.scatter(X_b, y_b,label='Actual Data Points')
+# Create and save the plot
+fig = plt.figure(figsize=(10, 6))
+plt.plot(X_new, y_predict, c='r', label='Prediction')
+plt.scatter(X_b, y_b, label='Actual Data Points')
 plt.legend()
 plt.xlabel('Score')
 plt.ylabel('Audit Risk')
 plt.title('Hyperparameter Tuning - Bagging : Score Vs. Audit Risk')
-plt.show(block=False)
+
+# Save the plot
+save_plot(fig, "bagging_score_vs_audit_risk.png")
 
 
 
@@ -284,14 +330,17 @@ results = gs.cv_results_
 # Reshape mean test scores into a 2D array for heatmap visualization
 scores = np.array(results["mean_test_score"]).reshape(len(param_dist['max_samples']), len(param_dist['n_estimators']))
 
-# Create a heatmap
-plt.figure(figsize=(10,10))
+# Create and save heatmap
+fig = plt.figure(figsize=(10, 10))
 sns.heatmap(scores, annot=True, xticklabels=param_dist['n_estimators'], yticklabels=param_dist['max_samples'], cmap="viridis")
 
 plt.xlabel('# of estimators')
 plt.ylabel('Max Samples')
 plt.title('Bagging (Decision Tree) - Validation Score Heatmap')
-plt.show(block=False)
+
+# Save the plot
+save_plot(fig, "bagging_decision_tree_heatmap.png")
+
 
 
 # Fitting the model with best parameters and Visualizing how it fits the data
@@ -309,15 +358,17 @@ bag_reg.fit(X_b, y_b)
 X_new=np.linspace(X_b.min(), X_b.max(), 100).reshape(100, 1)
 y_predict = bag_reg.predict(X_new)
 
-plt.figure(figsize=(10,6))
-plt.plot(X_new, y_predict, c = 'r',label='Prediction')
-plt.scatter(X_b, y_b,label='Actual Data Points')
+# Create and save the plot
+fig = plt.figure(figsize=(10, 6))
+plt.plot(X_new, y_predict, c='r', label='Prediction')
+plt.scatter(X_b, y_b, label='Actual Data Points')
 plt.legend()
 plt.xlabel('Score')
 plt.ylabel('Audit Risk')
 plt.title('Bagging with KNN : Score Vs. Audit Risk')
-plt.show(block=False)
 
+# Save the plot
+save_plot(fig, "bagging_knn_score_vs_audit_risk.png")
 
 
 
@@ -361,14 +412,17 @@ results = gs.cv_results_
 # Convert mean test scores into a 2D array for heatmap
 scores = np.array(results["mean_test_score"]).reshape(len(param_dist['max_samples']), len(param_dist['n_estimators']))
 
-# Create a heatmap
-plt.figure(figsize=(10,10))
+# Create and save heatmap
+fig = plt.figure(figsize=(10, 10))
 sns.heatmap(scores, annot=True, xticklabels=param_dist['n_estimators'], yticklabels=param_dist['max_samples'], cmap="YlGnBu")
 
 plt.xlabel('# of estimators')
 plt.ylabel('Max Samples')
 plt.title('Pasting with Decision Tree : Validation Score across different parameters')
-plt.show(block=False)
+
+# Save the plot
+save_plot(fig, "pasting_decision_tree_heatmap.png")
+
 
 # Fitting the model with best parameters and Visualizing how it fits the data
 
@@ -384,14 +438,17 @@ bag_reg.fit(X_b, y_b)
 X_new=np.linspace(X_b.min(), X_b.max(), 100).reshape(100, 1)
 y_predict = bag_reg.predict(X_new)
 
-plt.figure(figsize=(10,6))
-plt.plot(X_new, y_predict, c = 'r',label='Prediction')
-plt.scatter(X_b, y_b,label='Actual Data Points')
+# Create and save the plot
+fig = plt.figure(figsize=(10, 6))
+plt.plot(X_new, y_predict, c='r', label='Prediction')
+plt.scatter(X_b, y_b, label='Actual Data Points')
 plt.legend()
 plt.xlabel('Score')
 plt.ylabel('Audit Risk')
-plt.title('Pasting Pasting with Decision Tree : Score Vs. Audit Risk')
-plt.show(block=False)
+plt.title('Pasting with Decision Tree : Score Vs. Audit Risk')
+
+# Save the plot
+save_plot(fig, "pasting_decision_tree_score_vs_audit_risk.png")
 
 
 
@@ -439,14 +496,17 @@ results = gs.cv_results_
 # Reshape scores array for heatmap
 scores = np.array(results["mean_test_score"]).reshape(len(param_dist['max_samples']), len(param_dist['n_estimators']))
 
-# Plot heatmap
-plt.figure(figsize=(10,10))
+# Create and save heatmap
+fig = plt.figure(figsize=(10, 10))
 sns.heatmap(scores, annot=True, xticklabels=param_dist['n_estimators'], yticklabels=param_dist['max_samples'], cmap="viridis")
 
 plt.xlabel('# of estimators')
 plt.ylabel('Max Samples')
 plt.title('Pasting with KNN : Validation Score across different parameters')
-plt.show(block=False)
+
+# Save the plot
+save_plot(fig, "pasting_knn_heatmap.png")
+
 
 
 # Fitting the model with best parameters and Visualizing how it fits the data
@@ -463,14 +523,18 @@ bag_reg.fit(X_b, y_b)
 X_new=np.linspace(X_b.min(), X_b.max(), 100).reshape(100, 1)
 y_predict = bag_reg.predict(X_new)
 
-plt.figure(figsize=(10,6))
-plt.plot(X_new, y_predict, c = 'r',label='Prediction')
-plt.scatter(X_b, y_b,label='Actual Data Points')
+# Create and save the plot
+fig = plt.figure(figsize=(10, 6))
+plt.plot(X_new, y_predict, c='r', label='Prediction')
+plt.scatter(X_b, y_b, label='Actual Data Points')
 plt.legend()
 plt.xlabel('Score')
 plt.ylabel('Audit Risk')
-plt.title(' Pasting with KNN  : Score Vs. Audit Risk')
-plt.show(block=False)
+plt.title('Pasting with KNN : Score Vs. Audit Risk')
+
+# Save the plot
+save_plot(fig, "pasting_knn_score_vs_audit_risk.png")
+
 
 
 
@@ -519,16 +583,18 @@ results = gs.cv_results_
 
 # Reshape scores array for heatmap
 scores = np.array(results["mean_test_score"]).reshape(len(param_dist['learning_rate']), len(param_dist['n_estimators']))
-
-# Plot heatmap
-plt.figure(figsize=(10,10))
+# Create and save heatmap
+fig = plt.figure(figsize=(10, 10))
 sns.heatmap(scores, annot=True, xticklabels=param_dist['n_estimators'], 
             yticklabels=param_dist['learning_rate'], cmap="viridis")
 
 plt.xlabel('# of Estimators')
 plt.ylabel('Learning Rate')
-plt.title('AdaBoost -  with Decision Tree:  Validation Score Heatmap')
-plt.show(block=False)
+plt.title('AdaBoost with Decision Tree: Validation Score Heatmap')
+
+# Save the plot
+save_plot(fig, "adaboost_decision_tree_heatmap.png")
+
 
 # Fitting the model with best parameters and Visualizing how it fits the data
 
@@ -544,14 +610,18 @@ ada_reg.fit(X_b, y_b)
 X_new=np.linspace(X_b.min(), X_b.max(), 100).reshape(100, 1)
 y_predict = ada_reg.predict(X_new)
 
-plt.figure(figsize=(10,6))
-plt.plot(X_new, y_predict, c = 'r',label='Prediction')
-plt.scatter(X_b, y_b,label='Actual Data Points')
+# Create and save the plot
+fig = plt.figure(figsize=(10, 6))
+plt.plot(X_new, y_predict, c='r', label='Prediction')
+plt.scatter(X_b, y_b, label='Actual Data Points')
 plt.legend()
 plt.xlabel('Score')
 plt.ylabel('Audit Risk')
-plt.title('Adaboost with Decision Tree: Score Vs. Audit Risk')
-plt.show(block=False)
+plt.title('AdaBoost with Decision Tree: Score Vs. Audit Risk')
+
+# Save the plot
+save_plot(fig, "adaboost_decision_tree_score_vs_audit_risk.png")
+
 
 
 
@@ -594,17 +664,21 @@ if 'gs' in locals():
         len(param_dist['learning_rate']), len(param_dist['n_estimators'])
     )
 
-    # Plot heatmap
-    plt.figure(figsize=(10,10))
+    # Create and save heatmap
+    fig = plt.figure(figsize=(10,10))
     sns.heatmap(scores, annot=True, fmt=".2f", xticklabels=param_dist['n_estimators'], 
                 yticklabels=param_dist['learning_rate'], cmap="viridis")
 
     plt.xlabel('# of Estimators')
     plt.ylabel('Learning Rate')
-    plt.title('Adaboost with Linear SVR : Validation Score across Different Parameters')
-    plt.show(block=False)
+    plt.title('AdaBoost with Linear SVR: Validation Score across Different Parameters')
+
+    # Save the plot
+    save_plot(fig, "adaboost_linear_svr_heatmap.png")
+    
 else:
     print("Error: GridSearchCV has not been run. Run gs.fit(X_train, y_train) first.")
+
 
 # Fitting the model with best parameters and Visualizing how it fits the data
 
@@ -619,16 +693,17 @@ ada_reg.fit(X_b, y_b)
 
 X_new=np.linspace(X_b.min(), X_b.max(), 100).reshape(100, 1)
 y_predict = ada_reg.predict(X_new)
-
-plt.figure(figsize=(10,6))
-plt.plot(X_new, y_predict, c = 'r',label='Prediction')
-plt.scatter(X_b, y_b,label='Actual Data Points')
+# Create and save the plot
+fig = plt.figure(figsize=(10, 6))
+plt.plot(X_new, y_predict, c='r', label='Prediction')
+plt.scatter(X_b, y_b, label='Actual Data Points')
 plt.legend()
 plt.xlabel('Score')
 plt.ylabel('Audit Risk')
-plt.title('Adaboost with Linear SVR: Score Vs. Audit Risk')
-plt.show(block=False)
+plt.title('AdaBoost with Linear SVR: Score Vs. Audit Risk')
 
+# Save the plot
+save_plot(fig, "adaboost_linear_svr_score_vs_audit_risk.png")
 
 
 
@@ -674,17 +749,21 @@ if 'gs' in locals():
         len(param_dist['learning_rate']), len(param_dist['n_estimators'])
     )
 
-    # Plot heatmap
-    plt.figure(figsize=(10,10))
+    # Create and save heatmap
+    fig = plt.figure(figsize=(10,10))
     sns.heatmap(scores, annot=True, fmt=".2f", xticklabels=param_dist['n_estimators'], 
                 yticklabels=param_dist['learning_rate'], cmap="viridis")
 
     plt.xlabel('# of Estimators')
     plt.ylabel('Learning Rate')
     plt.title('Gradient Boosting - Validation Score Heatmap')
-    plt.show(block=False)
+
+    # Save the plot
+    save_plot(fig, "gradient_boosting_heatmap.png")
+    
 else:
     print("Error: GridSearchCV has not been run. Run gs.fit(X_train, y_train) first.")
+
 
 # Fitting the model with best parameters and Visualizing how it fits the data
 
@@ -701,14 +780,17 @@ gb.fit(X_b, y_b)
 X_new=np.linspace(X_b.min(), X_b.max(), 100).reshape(100, 1)
 y_predict = gb.predict(X_new)
 
-plt.figure(figsize=(10,6))
-plt.plot(X_new, y_predict, c = 'r',label='Prediction')
-plt.scatter(X_b, y_b,label='Actual Data Points')
+# Create and save the plot
+fig = plt.figure(figsize=(10, 6))
+plt.plot(X_new, y_predict, c='r', label='Prediction')
+plt.scatter(X_b, y_b, label='Actual Data Points')
 plt.legend()
 plt.xlabel('Score')
 plt.ylabel('Audit Risk')
 plt.title('Gradient Boosting : Score Vs. Audit Risk')
-plt.show(block=False)
+
+# Save the plot
+save_plot(fig, "gradient_boosting_score_vs_audit_risk.png")
 
 
 
@@ -754,7 +836,6 @@ gs.fit(X_train, y_train)
 print('Best Parameters:', gs.best_params_)
 
 # Visualizing Cross-Validation Results
-
 # Ensure GridSearchCV has been run before accessing results
 if 'gs' in locals() and hasattr(gs, "cv_results_"):
     # Extracting scores from GridSearchCV results
@@ -766,19 +847,23 @@ if 'gs' in locals() and hasattr(gs, "cv_results_"):
             len(param_dist['learning_rate']), len(param_dist['n_estimators'])
         )
 
-        # Plot heatmap
-        plt.figure(figsize=(10,10))
+        # Create and save heatmap
+        fig = plt.figure(figsize=(10,10))
         sns.heatmap(scores, annot=True, fmt=".2f", xticklabels=param_dist['n_estimators'], 
                     yticklabels=param_dist['learning_rate'], cmap="viridis")
 
         plt.xlabel('# of Estimators')
         plt.ylabel('Learning Rate')
         plt.title('Validation Score across Different Parameters')
-        plt.show(block=False)
+
+        # Save the plot
+        save_plot(fig, "gridsearchcv_validation_heatmap.png")
+        
     else:
         print("Error: 'mean_test_score' not found in GridSearchCV results. Check `gs.cv_results_`.")
 else:
     print("Error: GridSearchCV object `gs` not found or not fitted. Run `gs.fit(X_train, y_train)` first.")
+
 
 # Fitting Model with Best Parameters
 
@@ -797,14 +882,18 @@ best_xgb.fit(X_b, y_b)
 X_new = np.linspace(X_b.min(), X_b.max(), 100).reshape(-1, 1)
 y_predict = best_xgb.predict(X_new)
 
-plt.figure(figsize=(10,6))
+# Create and save the plot
+fig = plt.figure(figsize=(10, 6))
 plt.plot(X_new, y_predict, c='r', label='Prediction')
 plt.scatter(X_b, y_b, label='Actual Data Points')
 plt.legend()
 plt.xlabel('Score')
 plt.ylabel('Audit Risk')
 plt.title('XGBoost - GridSearch Heatmap: Estimators vs Learning Rate')
-plt.show(block=False)
+
+# Save the plot
+save_plot(fig, "xgboost_gridsearch_heatmap.png")
+
 
 import os
 import joblib
@@ -825,7 +914,6 @@ print(f"Model saved successfully at '{model_path}'")
 
 
 # --------------------------------------------------------- SHAP   ------------------------------------------------------------
-
 import shap
 import xgboost
 import numpy as np
@@ -836,7 +924,7 @@ from xgboost import XGBRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_diabetes  # Use a valid dataset
 
- # Load dataset (use any dataset suitable for regression)
+# Load dataset (use any dataset suitable for regression)
 data = load_diabetes()
 X, y = data.data, data.target
 feature_names = data.feature_names
@@ -859,35 +947,51 @@ shap_df = pd.DataFrame(shap_values, columns=feature_names)
 
 print("SHAP values computed.")
 
-# Global Feature Importance (Summary Plot)
+# Ensure all SHAP plots are saved in the 'plots' folder
+PLOT_DIR = "plots"
+os.makedirs(PLOT_DIR, exist_ok=True)
 
-shap.summary_plot(shap_values, X_test, feature_names=feature_names)
+# SHAP Global Feature Importance (Summary Plot)
+fig, ax = plt.subplots()
+shap.summary_plot(shap_values, X_test, feature_names=feature_names, show=False)
 plt.title("SHAP Global Feature Importance - XGBoost")
+plt.savefig(f"{PLOT_DIR}/shap_global_feature_importance.png")
+plt.close()
 
-# Feature Importance as Bar Chart
-
-shap.summary_plot(shap_values, X_test, plot_type="bar", feature_names=feature_names)
+# SHAP Feature Importance as Bar Chart
+fig, ax = plt.subplots()
+shap.summary_plot(shap_values, X_test, plot_type="bar", feature_names=feature_names, show=False)
 plt.title("SHAP Feature Importance as Bar Chart - XGBoost")
+plt.savefig(f"{PLOT_DIR}/shap_feature_importance_bar_chart.png")
+plt.close()
 
-# Feature Interaction (Dependence Plot)
-
-shap.dependence_plot("bmi", shap_values, X_test, feature_names=feature_names)
+# SHAP Feature Interaction (Dependence Plot)
+fig, ax = plt.subplots()
+shap.dependence_plot("bmi", shap_values, X_test, feature_names=feature_names, show=False)
 plt.title("SHAP Feature Interaction - XGBoost")
+plt.savefig(f"{PLOT_DIR}/shap_feature_interaction.png")
+plt.close()
 
-# Force Plot (Explaining a Single Prediction)
-
+# SHAP Force Plot (Explaining a Single Prediction)
 i = 10  # Choose a specific observation
 shap.force_plot(explainer.expected_value, shap_values[i, :], X_test[i, :], feature_names=feature_names, matplotlib=True)
 plt.title("SHAP Force Plot - XGBoost")
+plt.savefig(f"{PLOT_DIR}/shap_force_plot.png")
+plt.close()
 
-# Waterfall Plot (Breakdown of Prediction)
-
-shap.waterfall_plot(shap.Explanation(values=shap_values[0], base_values=explainer.expected_value, data=X_test[0], feature_names=feature_names))
+# SHAP Waterfall Plot (Breakdown of Prediction)
+fig, ax = plt.subplots()
+shap.waterfall_plot(shap.Explanation(values=shap_values[0], base_values=explainer.expected_value, 
+                                     data=X_test[0], feature_names=feature_names))
 plt.title("SHAP Waterfall Plot - XGBoost")
+plt.savefig(f"{PLOT_DIR}/shap_waterfall_plot.png")
+plt.close()
 
-# Decision Plot
-
+# SHAP Decision Plot
+fig = plt.figure()
 shap.decision_plot(explainer.expected_value, shap_values, feature_names=feature_names)
 plt.title("SHAP Decision Plot - XGBoost")
+plt.savefig(f"{PLOT_DIR}/shap_decision_plot.png")
+plt.close()
 
-
+print("All SHAP plots have been saved successfully!")

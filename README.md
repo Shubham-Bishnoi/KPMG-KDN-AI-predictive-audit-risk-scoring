@@ -103,7 +103,6 @@ streamlit run frontend/app.py
 This project is licensed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
 ---
-
 ##  Code of Conduct
 We follow a **friendly and inclusive** environment. Check out [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) for guidelines.
 
@@ -112,6 +111,7 @@ We follow a **friendly and inclusive** environment. Check out [`CODE_OF_CONDUCT.
 ##  Demo & Usage
 ###  API Demo
 Test the API with `curl`:
+
 ```bash
 curl -X 'POST' 'http://127.0.0.1:8000/predict' -H 'Content-Type: application/json' -d '{
   "feature1": 1.5,
@@ -138,19 +138,94 @@ curl -X 'POST' 'http://127.0.0.1:8000/predict' -H 'Content-Type: application/jso
 ```
 
 ###  UI Demo
-1. **Start Streamlit App:**
-   ```bash
-   streamlit run frontend/app.py
-   ```
-2. Open `http://localhost:8501/` in your browser.
+
+```bash
+# Start Streamlit App
+streamlit run frontend/app.py
+```
+
+Open `http://localhost:8501/` in your browser.
 
 ---
 
 ##  Future Improvements
-- [ ] **Real-time Risk Monitoring** 
-- [ ] **Deploy to AWS/GCP** 
-- [ ] **Enhance SHAP Explainability** 
-- [ ] **Integrate Database Storage** 
 
- **Have suggestions? Feel free to open an issue!** 
+```markdown
+- [ ] **Real-time Risk Monitoring**
+- [ ] **Deploy to AWS/GCP**
+- [ ] **Enhance SHAP Explainability**
+- [ ] **Integrate Database Storage**
+```
 
+##  Model Training & SHAP Analysis
+
+###  Trained Model
+The trained XGBoost model has been successfully saved at:
+
+```bash
+/Users/shubhambishnoi/Desktop/task1/backend/xgb_model.pkl
+```
+
+### Best Hyperparameters:
+```bash
+{'learning_rate': 0.1, 'n_estimators': 400}
+```
+
+### Model Performance:
+```yaml
+Train Score: 0.9982882729944789
+Test Score: 0.9450530284419184
+```
+
+###  Generated Plots
+All plots generated during training and SHAP analysis are saved in the **plots/** directory:
+
+|  Plot Name | Description |
+|-------------|-------------|
+| `adaboost_decision_tree_heatmap.png` | AdaBoost hyperparameter heatmap |
+| `adaboost_decision_tree_score_vs_audit_risk.png` | AdaBoost prediction vs actual risk |
+| `adaboost_linear_svr_heatmap.png` | AdaBoost Linear SVR hyperparameter heatmap |
+| `adaboost_linear_svr_score_vs_audit_risk.png` | AdaBoost Linear SVR prediction plot |
+| `audit_risk_distribution.png` | Audit Risk distribution |
+| `bagging_decision_tree_heatmap.png` | Bagging Decision Tree hyperparameter heatmap |
+| `bagging_knn_score_vs_audit_risk.png` | Bagging KNN prediction vs audit risk |
+| `bagging_hyperparameter_tuning_heatmap.png` | Bagging model hyperparameter tuning heatmap |
+| `bagging_score_vs_audit_risk.png` | Bagging model prediction plot |
+| `correlation_heatmap_after.png` | Correlation heatmap after feature selection |
+| `correlation_heatmap_before.png` | Correlation heatmap before feature selection |
+| `count_of_risk_levels.png` | Count of different risk levels |
+| `float_features_histogram.png` | Histogram of float-type features |
+| `gradient_boosting_heatmap.png` | Gradient Boosting hyperparameter heatmap |
+| `gradient_boosting_score_vs_audit_risk.png` | Gradient Boosting prediction vs audit risk |
+| `gridsearchcv_validation_heatmap.png` | GridSearchCV validation heatmap |
+| `integer_features_histogram.png` | Histogram of integer-type features |
+| `pasting_decision_tree_heatmap.png` | Pasting Decision Tree hyperparameter heatmap |
+| `pasting_decision_tree_score_vs_audit_risk.png` | Pasting Decision Tree prediction plot |
+| `pasting_knn_heatmap.png` | Pasting KNN hyperparameter heatmap |
+| `pasting_knn_score_vs_audit_risk.png` | Pasting KNN prediction plot |
+| `scaled_features_boxplot.png` | Scaled feature distributions |
+| `shap_feature_importance_bar_chart.png` | SHAP feature importance (bar plot) |
+| `shap_feature_interaction.png` | SHAP feature interaction plot |
+| `shap_global_feature_importance.png` | SHAP global feature importance |
+| `xgboost_gridsearch_heatmap.png` | XGBoost GridSearchCV hyperparameter heatmap |
+
+---
+
+###  SHAP Force Plot (Interactive)
+SHAP force plots cannot be saved as images, so they are saved as an **interactive HTML file**:
+
+####  File Location:
+```bash
+/plots/shap_force_plot.html
+```
+
+Open this file in any browser to explore individual prediction explanations.
+
+---
+
+###  Next Steps:
+- Improve the model by tuning additional hyperparameters.
+- Experiment with feature selection techniques.
+- Compare XGBoost performance with other ensemble models.
+
+**Have suggestions? Feel free to open an issue!**

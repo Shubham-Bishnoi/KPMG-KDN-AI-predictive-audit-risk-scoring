@@ -9,7 +9,7 @@ app = Flask(__name__)
 # Load trained model
 model_path = "backend/xgb_model.pkl"
 if not os.path.exists(model_path):
-    raise FileNotFoundError("❌ Model file not found. Train and save the model first!")
+    raise FileNotFoundError(" Model file not found. Train and save the model first!")
 
 model = joblib.load(model_path)
 
